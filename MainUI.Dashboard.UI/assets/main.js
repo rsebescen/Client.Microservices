@@ -21,7 +21,7 @@ function sendData() {
         document.getElementById("root").innerHTML = "<div>Sent</div>";
         }
     };
-    xhttp.open("POST", "brb/api/data", true);
+    xhttp.open("DELETE", "brb/api/data", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send('{"firstname":"pera","lastname":"peric"}');
 }
