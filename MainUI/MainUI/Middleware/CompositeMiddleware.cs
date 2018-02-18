@@ -1,5 +1,6 @@
 ﻿using MainUI.Domain;
 using MainUI.Services;
+using MainUI.ValueObjects;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
@@ -11,15 +12,17 @@ namespace MainUI.Middleware
     public class CompositeMiddleware
     {
         private readonly RequestDelegate _next;
+        private readonly CompositePages _pages;
 
-        public CompositeMiddleware(RequestDelegate next)
+        public CompositeMiddleware(RequestDelegate next, CompositePages pages)
         {
             _next = next;
+            _pages = pages;
         }
 
         public async Task Invoke(HttpContext httpContext)
         {
-            var compositeRequest = new CompositeContext(httpContext, Pages);
+            var compositeRequest = new CompositeContext(httpContext, _pages);
 
             if (compositeRequest.RequestType.Equals(CompositeRequestType.NotSupported))
             {
@@ -30,21 +33,6 @@ namespace MainUI.Middleware
 
             await handler.Handle(_next);
         }
-
-        private static CompositePage[] Pages = new[] {
-            new CompositePage
-            {
-                Name = "Alo",
-                MatchString = "/alo",
-                BaseUrl = "http://localhost:8080"
-            },
-            new CompositePage
-            {
-                Name = "Brb",
-                MatchString = "/brb",
-                BaseUrl = "http://localhost:3000"
-            }
-        };
     }
 
 }

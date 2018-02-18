@@ -1,4 +1,5 @@
 ﻿using HtmlAgilityPack;
+using System;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -15,25 +16,39 @@ namespace MainUI.Services
 
         internal async Task<string> GetContent()
         {
-            WebRequest request = WebRequest.Create(remotePath);
-            var cont = await request.GetResponseAsync();
-            var remoteDoc = new HtmlDocument();
-            remoteDoc.Load(cont.GetResponseStream());
+            try
+            {
+                WebRequest request = WebRequest.Create(remotePath);
+                var cont = await request.GetResponseAsync();
+                var remoteDoc = new HtmlDocument();
+                remoteDoc.Load(cont.GetResponseStream());
 
-            return remoteDoc.ParsedText;
+                return remoteDoc.ParsedText;
+            }
+            catch (Exception)
+            {
+                return "Page cannot be loaded ATM";
+            }
         }
 
         internal async Task<string> GetHtml()
         {
-            WebRequest request = WebRequest.Create(remotePath);
-            var cont = await request.GetResponseAsync();
+            try
+            {
+                WebRequest request = WebRequest.Create(remotePath);
+                var cont = await request.GetResponseAsync();
 
-            var remoteStream = cont.GetResponseStream();
+                var remoteStream = cont.GetResponseStream();
 
-            var remoteDoc = new HtmlDocument();
-            remoteDoc.Load(remoteStream);
-            var node = remoteDoc.DocumentNode.SelectNodes("//body")[0];
-            return node.OuterHtml;
+                var remoteDoc = new HtmlDocument();
+                remoteDoc.Load(remoteStream);
+                var node = remoteDoc.DocumentNode.SelectNodes("//body")[0];
+                return node.OuterHtml;
+            }
+            catch (Exception)
+            {
+                return "Page cannot be loaded ATM";
+            }
         }
     }
 }

@@ -7,6 +7,7 @@ using HtmlAgilityPack;
 using MainUI.Domain;
 using MainUI.Middleware;
 using MainUI.Services;
+using MainUI.ValueObjects;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
@@ -51,7 +52,7 @@ namespace MainUI
                 routes.MapRoute("mapped", "{controller}/{action}");
             });
             
-            app.UseMiddleware<CompositeMiddleware>();
+            app.UseMiddleware<CompositeMiddleware>(Pages);
 
             app.UseMvc(routes =>
             {
@@ -65,5 +66,20 @@ namespace MainUI
                     });
             });
         }
+
+        private static CompositePages Pages = new CompositePages(new[] {
+            new CompositePage
+            {
+                Name = "Alo",
+                MatchString = "/alo",
+                BaseUrl = "http://localhost:8080"
+            },
+            new CompositePage
+            {
+                Name = "Brb",
+                MatchString = "/brb",
+                BaseUrl = "http://localhost:3000"
+            }
+        });
     }
 }

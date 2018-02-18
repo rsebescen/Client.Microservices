@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using MainUI.Services;
+using MainUI.ValueObjects;
 using Microsoft.AspNetCore.Http;
 
 namespace MainUI.Domain
@@ -14,10 +15,10 @@ namespace MainUI.Domain
         public HttpContext HttpContext;
         internal CompositeRequestType RequestType;
 
-        public CompositeContext(HttpContext httpContext, CompositePage[] pages)
+        public CompositeContext(HttpContext httpContext, CompositePages pages)
         {
             HttpContext = httpContext;
-            compositePage = pages.FirstOrDefault(DoesMatch);
+            compositePage = pages.ThatMatch(DoesMatch);
             RequestType = DistinguishRequestType();
         }
 
