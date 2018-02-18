@@ -31,12 +31,20 @@ namespace MainUI.Middleware
             await handler.Handle(_next);
         }
 
-        private static CompositePage[] Pages = new[] {new CompositePage
-        {
-            Name = "Alo",
-            MatchString = "/alo",
-            BaseUrl = "http://localhost:8080"
-        } };
+        private static CompositePage[] Pages = new[] {
+            new CompositePage
+            {
+                Name = "Alo",
+                MatchString = "/alo",
+                BaseUrl = "http://localhost:8080"
+            },
+            new CompositePage
+            {
+                Name = "Brb",
+                MatchString = "/brb",
+                BaseUrl = "http://localhost:3000"
+            }
+        };
     }
 
 }

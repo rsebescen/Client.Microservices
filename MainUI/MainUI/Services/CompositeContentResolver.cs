@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Threading.Tasks;
 
 namespace MainUI.Services
@@ -17,7 +18,7 @@ namespace MainUI.Services
             switch (compositeRequest.RequestType)
             {
                 case CompositeRequestType.Asset:
-                    handler = new AssetHandler(compositeRequest);
+                    handler = new ContentHandler(compositeRequest);
                     break;
                 case CompositeRequestType.Rest:
                     handler = new RestHandler(compositeRequest);
@@ -48,9 +49,9 @@ namespace MainUI.Services
         public abstract Task Handle(RequestDelegate next);
     }
 
-    public class AssetHandler : ARemoteContentHandler
+    public class ContentHandler : ARemoteContentHandler
     {
-        public AssetHandler(CompositeContext compositeRequest)
+        public ContentHandler(CompositeContext compositeRequest)
             : base(compositeRequest)
         {
 
@@ -66,13 +67,33 @@ namespace MainUI.Services
 
     public class RestHandler : ARemoteContentHandler
     {
+
         public RestHandler(CompositeContext compositeRequest) : base(compositeRequest)
         {
         }
 
         public override async Task Handle(RequestDelegate next)
         {
-            throw new NotImplementedException();
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(CompositeContext.RemotePath);
+            request.Method = CompositeContext.HttpContext.Request.Method;
+            request.ContentType = CompositeContext.HttpContext.Request.ContentType;
+            request.ContentLength = CompositeContext.HttpContext.Request.ContentLength.Value;
+            var body = new StreamReader(CompositeContext.HttpContext.Request.Body).ReadToEnd();
+            StreamWriter requestWriter = new StreamWriter(request.GetRequestStream(), System.Text.Encoding.ASCII);
+            requestWriter.Write(body);
+            requestWriter.Close();
+
+            try
+            {
+                WebResponse webResponse = request.GetResponse();
+                Stream webStream = webResponse.GetResponseStream();
+                StreamReader responseReader = new StreamReader(webStream);
+                string response = responseReader.ReadToEnd();
+                responseReader.Close();
+            }
+            catch (Exception e)
+            {
+            }
         }
     }
 
@@ -89,6 +110,23 @@ namespace MainUI.Services
             var remoteHtml = await RemoteFetcher.GetHtml();
             remoteHtml = remoteHtml.Replace("src=\"", $"src=\"{CompositeContext.MatchString}");
 
+            response = await GetTemplate(next);
+
+            HtmlDocument doc = new HtmlDocument();
+            doc.LoadHtml(response);
+
+            var remoteNodes = new HtmlNodeCollection(null);
+            remoteNodes.Add(HtmlNode.CreateNode(remoteHtml));
+
+            doc.DocumentNode.SelectNodes("//body/div")[0].PrependChildren(remoteNodes);
+            response = doc.DocumentNode.InnerHtml;
+
+            // Send our modified content to the response body.
+            await CompositeContext.HttpContext.Response.WriteAsync(response);
+        }
+
+        private async Task<string> GetTemplate(RequestDelegate next)
+        {
             var existingBody = CompositeContext.HttpContext.Response.Body;
             using (var newBody = new MemoryStream())
             {
@@ -102,19 +140,7 @@ namespace MainUI.Services
                 newBody.Seek(0, SeekOrigin.Begin);
 
                 // newContent will be `Hello`.
-                response = new StreamReader(newBody).ReadToEnd();
-
-                HtmlDocument doc = new HtmlDocument();
-                doc.LoadHtml(response);
-
-                var remoteNodes = new HtmlNodeCollection(null);
-                remoteNodes.Add(HtmlNode.CreateNode(remoteHtml));
-
-                doc.DocumentNode.SelectNodes("//body/div")[0].PrependChildren(remoteNodes);
-                response = doc.DocumentNode.InnerHtml;
-
-                // Send our modified content to the response body.
-                await CompositeContext.HttpContext.Response.WriteAsync(response);
+                return new StreamReader(newBody).ReadToEnd();
             }
         }
     }

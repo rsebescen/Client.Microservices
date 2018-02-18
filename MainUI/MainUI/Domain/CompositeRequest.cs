@@ -39,7 +39,8 @@ namespace MainUI.Domain
                 return CompositeRequestType.NotSupported;
             }
 
-            if (RequestPath.Contains("/assets/") || RequestPath.Contains(".js"))
+            if (RequestPath.Contains("/assets/") || RequestPath.Contains(".js")
+                    || (RequestPath.Contains("/api/") && HttpContext.Request.Method.Equals("GET")))
             {
                 return CompositeRequestType.Asset;
             }
