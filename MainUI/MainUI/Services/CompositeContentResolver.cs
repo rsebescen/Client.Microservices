@@ -74,8 +74,47 @@ namespace MainUI.Services
 
         public override async Task Handle(RequestDelegate next)
         {
+            switch (CompositeContext.HttpContext.Request.Method)
+            {
+                case "GET":
+                    await HandleGet();
+                    break;
+                case "POST":
+                    await HandlePost();
+                    break;
+                case "PATCH":
+                    await HandlePatch();
+                    break;
+                case "DELETE":
+                    await HandleDelete();
+                    break;
+            }
+        }
+
+        private async Task HandleGet()
+        {
             HttpWebRequest request = (HttpWebRequest)WebRequest.Create(CompositeContext.RemotePath);
-            request.Method = CompositeContext.HttpContext.Request.Method;
+
+            try
+            {
+                WebResponse webResponse = request.GetResponse();
+                Stream webStream = webResponse.GetResponseStream();
+                StreamReader responseReader = new StreamReader(webStream);
+                string response = responseReader.ReadToEnd();
+                responseReader.Close();
+
+                CompositeContext.HttpContext.Response.StatusCode = StatusCodes.Status200OK;
+                await CompositeContext.HttpContext.Response.WriteAsync(response);
+            }
+            catch (Exception e)
+            {
+            }
+        }
+
+        private async Task HandlePost()
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(CompositeContext.RemotePath);
+            request.Method = "POST";
             request.ContentType = CompositeContext.HttpContext.Request.ContentType;
             request.ContentLength = CompositeContext.HttpContext.Request.ContentLength.Value;
             var body = new StreamReader(CompositeContext.HttpContext.Request.Body).ReadToEnd();
@@ -90,6 +129,47 @@ namespace MainUI.Services
                 StreamReader responseReader = new StreamReader(webStream);
                 string response = responseReader.ReadToEnd();
                 responseReader.Close();
+
+                CompositeContext.HttpContext.Response.StatusCode = StatusCodes.Status201Created;
+                await CompositeContext.HttpContext.Response.WriteAsync(response);
+            }
+            catch (Exception e)
+            {
+            }
+        }
+
+        private async Task HandlePatch()
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(CompositeContext.RemotePath);
+            request.Method = "PATCH";
+            request.ContentType = CompositeContext.HttpContext.Request.ContentType;
+            request.ContentLength = CompositeContext.HttpContext.Request.ContentLength.Value;
+            var body = new StreamReader(CompositeContext.HttpContext.Request.Body).ReadToEnd();
+            StreamWriter requestWriter = new StreamWriter(request.GetRequestStream(), System.Text.Encoding.ASCII);
+            requestWriter.Write(body);
+            requestWriter.Close();
+
+            try
+            {
+                WebResponse webResponse = request.GetResponse();
+
+                CompositeContext.HttpContext.Response.StatusCode = StatusCodes.Status204NoContent;
+            }
+            catch (Exception e)
+            {
+            }
+        }
+
+        private async Task HandleDelete()
+        {
+            HttpWebRequest request = (HttpWebRequest)WebRequest.Create(CompositeContext.RemotePath);
+            request.Method = "DELETE";
+
+            try
+            {
+                WebResponse webResponse = request.GetResponse();
+
+                CompositeContext.HttpContext.Response.StatusCode = StatusCodes.Status204NoContent;
             }
             catch (Exception e)
             {
