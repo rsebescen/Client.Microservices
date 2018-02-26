@@ -2,12 +2,17 @@ function loadData() {
     var xhttp = new XMLHttpRequest();
     xhttp.onreadystatechange = function() {
         if (this.readyState == 4 && this.status == 200) {
-            console.log(JSON.parse(this.responseText));
-        document.getElementById("root").innerHTML = "<div>Alo</div>";
+            var data = JSON.parse(this.responseText);
+            var str = "<ul>";
+            for (var i = 0; i< data.length; i++) {
+                str+="<li>"+data[i].firstname+" "+data[i].lastname+"</li>";
+            }
+            str+="</ul>";
+        document.getElementById("root").innerHTML = "<div>"+str+"</div>";
             sendData();
         }
     };
-    xhttp.open("GET", "brb/api/data", true);
+    xhttp.open("GET", "/brb/api/data", true);
     xhttp.send();
 }
 
@@ -21,7 +26,7 @@ function sendData() {
         document.getElementById("root").innerHTML = "<div>Sent</div>";
         }
     };
-    xhttp.open("DELETE", "brb/api/data", true);
+    xhttp.open("POST", "/brb/api/data", true);
     xhttp.setRequestHeader("Content-type", "application/json");
     xhttp.send('{"firstname":"pera","lastname":"peric"}');
 }

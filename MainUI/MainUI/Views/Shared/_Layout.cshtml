@@ -1,4 +1,7 @@
-﻿<!DOCTYPE html>
+﻿@using MainUI.ValueObjects
+@using Microsoft.AspNetCore.Mvc.Routing
+@inject CompositePages CompositePages
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -30,17 +33,34 @@
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li @(ViewData["Title"].ToString() == "Other" ? "style=background-color:red" : "")>
-                        <a href="/alo">Alo</a>
-                    </li>
-                    @foreach (string menuItem in MainUI.User.Menu)
+                    @foreach (var menuItem in MainUI.User.Menu)
                     {
-                        var style = (ViewData["Title"].ToString() == menuItem) ? "style=background-color:red" : "";
+                        var style = ViewContext.HttpContext.Request.Path.Value.StartsWith(menuItem.Url) ? "style=background-color:red" : "";
                         @:
                         <li @style>
-                            <a href="/Home/@menuItem">
-                                @menuItem
+                            <a href="@menuItem.Url">
+                                @menuItem.Name
                             </a>
+                        </li>
+                    }
+                    @foreach (var menuItem in CompositePages.Pages)
+                    {
+                        var style = ViewContext.HttpContext.Request.Path.Value.StartsWith(menuItem.MatchString) ? "style=background-color:red" : "";
+                        @:
+                        <li @style>
+                            <a href="@menuItem.MatchString">
+                                @menuItem.Name
+                            </a>
+                            <ul class="submenu">
+                                @foreach (var subMenuItem in menuItem.MenuItems)
+                                {
+                                    <li>
+                                        <a href="@menuItem.MatchString@subMenuItem.Url">
+                                            @subMenuItem.Name
+                                        </a>
+                                    </li>
+                                }
+                            </ul>
                         </li>
                     }
                 </ul>

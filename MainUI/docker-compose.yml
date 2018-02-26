@@ -1,0 +1,8 @@
+version: '3'
+
+services:
+  mainui.service1:
+    image: mainui.service1
+    build:
+      context: .
+      dockerfile: MainUI.Service1/Dockerfile

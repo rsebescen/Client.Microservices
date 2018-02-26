@@ -10,6 +10,8 @@ namespace MainUI.ValueObjects
     {
         IEnumerable<CompositePage> _compositePages;
 
+        public CompositePage[] Pages => _compositePages.ToArray();
+
         public CompositePages(IEnumerable<CompositePage> compositePages)
         {
             _compositePages = compositePages;

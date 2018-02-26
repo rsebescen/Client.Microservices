@@ -29,6 +29,7 @@ namespace MainUI
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddMvc();
+            services.AddSingleton<CompositePages>(Pages);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -52,7 +53,7 @@ namespace MainUI
                 routes.MapRoute("mapped", "{controller}/{action}");
             });
             
-            app.UseMiddleware<CompositeMiddleware>(Pages);
+            app.UseMiddleware<CompositeMiddleware>();
 
             app.UseMvc(routes =>
             {
@@ -72,13 +73,39 @@ namespace MainUI
             {
                 Name = "Alo",
                 MatchString = "/alo",
-                BaseUrl = "http://localhost:8080"
+                BaseUrl = "http://localhost:8080",
+                MenuItems = new MenuItem[0]
             },
             new CompositePage
             {
                 Name = "Brb",
                 MatchString = "/brb",
-                BaseUrl = "http://localhost:3000"
+                BaseUrl = "http://localhost:3000",
+                MenuItems = new MenuItem[0]
+            },
+            new CompositePage
+            {
+                Name = "Service1",
+                MatchString = "/service1",
+                BaseUrl = "http://localhost:4623/",
+                MenuItems = new MenuItem[]
+                {
+                    new MenuItem
+                    {
+                        Name = "Home",
+                        Url = "/Home/Index"
+                    },
+                    new MenuItem
+                    {
+                        Name = "About",
+                        Url = "/Home/About"
+                    },
+                    new MenuItem
+                    {
+                    Name = "Contact",
+                    Url = "/Home/Contact"
+                    }
+                }
             }
         });
     }

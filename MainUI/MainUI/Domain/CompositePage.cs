@@ -9,6 +9,13 @@ namespace MainUI.Domain
     {
         public string Name { get; set; }
         public string BaseUrl { get; set; }
-        public string MatchString { get; set; }        
+        public string MatchString { get; set; }
+        public MenuItem[] MenuItems { get; set; }
+    }
+
+    public class MenuItem
+    {
+        public string Name { get; set; }
+        public string Url { get; set; }  
     }
 }
