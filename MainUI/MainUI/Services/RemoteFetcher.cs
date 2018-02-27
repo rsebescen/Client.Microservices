@@ -31,7 +31,7 @@ namespace MainUI.Services
             }
         }
 
-        internal async Task<string> GetHtml()
+        internal async Task<RemoteHtmlData> GetHtml()
         {
             try
             {
@@ -42,12 +42,21 @@ namespace MainUI.Services
 
                 var remoteDoc = new HtmlDocument();
                 remoteDoc.Load(remoteStream);
-                var node = remoteDoc.DocumentNode.SelectNodes("//body")[0];
-                return node.OuterHtml;
+                var body = remoteDoc.DocumentNode.SelectNodes("//body")[0];
+                var head = remoteDoc.DocumentNode.SelectNodes("//head")[0];
+
+                return new RemoteHtmlData
+                {
+                    Head = head,
+                    Body = body
+                };
             }
             catch (Exception)
             {
-                return "Page cannot be loaded ATM";
+                return new RemoteHtmlData
+                {
+                    Body = HtmlNode.CreateNode("Page cannot be loaded ATM")
+                };
             }
         }
     }

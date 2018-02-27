@@ -171,17 +171,17 @@ namespace MainUI.Services
             var response = string.Empty;
 
             var remoteHtml = await RemoteFetcher.GetHtml();
-            remoteHtml = remoteHtml.Replace("src=\"", $"src=\"{CompositeContext.MatchString}");
 
             response = await GetTemplate(next);
 
             HtmlDocument doc = new HtmlDocument();
             doc.LoadHtml(response);
 
-            var remoteNodes = new HtmlNodeCollection(null);
-            remoteNodes.Add(HtmlNode.CreateNode(remoteHtml));
-
-            doc.DocumentNode.SelectNodes("//body/div")[0].PrependChildren(remoteNodes);
+            if (remoteHtml.Head != null)
+                doc.DocumentNode.SelectNodes("//head")[0].PrependChild(remoteHtml.Head);
+            if (remoteHtml.Body != null)
+                doc.DocumentNode.SelectNodes("//body/div")[0].PrependChild(remoteHtml.Body);
+            
             response = doc.DocumentNode.InnerHtml;
 
             // Send our modified content to the response body.

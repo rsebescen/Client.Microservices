@@ -24,7 +24,7 @@ namespace MainUI.Domain
 
         private string RequestPath => HttpContext.Request.Path.Value;
 
-        public string RemotePath => $"{compositePage.BaseUrl}{RequestPath.Replace(compositePage.MatchString, "")}";
+        public string RemotePath => $"{compositePage.BaseUrl.Substring(0, compositePage.BaseUrl.Length-1)}{RequestPath}";
 
         public string MatchString => compositePage.MatchString;
 

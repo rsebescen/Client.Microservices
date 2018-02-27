@@ -43,7 +43,7 @@ namespace MainUI.Service1
             {
                 routes.MapRoute(
                     name: "default",
-                    template: "{controller=Home}/{action=Index}/{id?}");
+                    template: "service1/{controller=Home}/{action=Index}/{id?}");
             });
         }
     }

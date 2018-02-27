@@ -87,23 +87,23 @@ namespace MainUI
             {
                 Name = "Service1",
                 MatchString = "/service1",
-                BaseUrl = "http://localhost:4623/",
+                BaseUrl = "http://localhost:51588/",
                 MenuItems = new MenuItem[]
                 {
                     new MenuItem
                     {
                         Name = "Home",
-                        Url = "/Home/Index"
+                        Url = "service1/Home/Index"
                     },
                     new MenuItem
                     {
                         Name = "About",
-                        Url = "/Home/About"
+                        Url = "service1/Home/About"
                     },
                     new MenuItem
                     {
                     Name = "Contact",
-                    Url = "/Home/Contact"
+                    Url = "service1/Home/Contact"
                     }
                 }
             }
