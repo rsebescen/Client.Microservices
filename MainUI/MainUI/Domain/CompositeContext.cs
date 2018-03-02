@@ -24,7 +24,7 @@ namespace MainUI.Domain
 
         private string RequestPath => HttpContext.Request.Path.Value;
 
-        public string RemotePath => $"{compositePage.BaseUrl.Substring(0, compositePage.BaseUrl.Length-1)}{RequestPath}";
+        public string RemotePath => $"{compositePage.BaseUrl.Substring(0, compositePage.BaseUrl.Length-1)}{RequestPath.Replace(MatchString, "")}";
 
         public string MatchString => compositePage.MatchString;
 
@@ -40,8 +40,7 @@ namespace MainUI.Domain
                 return CompositeRequestType.NotSupported;
             }
 
-            if (RequestPath.Contains("/assets/") || RequestPath.Contains(".js")
-                    || (RequestPath.Contains("/api/") && HttpContext.Request.Method.Equals("GET")))
+            if (RequestPath.Contains("/assets/") || RequestPath.Contains(".js") || RequestPath.Contains(".css"))
             {
                 return CompositeRequestType.Asset;
             }

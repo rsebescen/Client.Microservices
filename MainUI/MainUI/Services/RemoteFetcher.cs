@@ -1,5 +1,6 @@
 ﻿using HtmlAgilityPack;
 using System;
+using System.IO;
 using System.Net;
 using System.Threading.Tasks;
 
@@ -31,7 +32,7 @@ namespace MainUI.Services
             }
         }
 
-        internal async Task<RemoteHtmlData> GetHtml()
+        internal async Task<RemoteHtmlData> GetHtml(string serviceUrlPrefix)
         {
             try
             {
@@ -39,9 +40,13 @@ namespace MainUI.Services
                 var cont = await request.GetResponseAsync();
 
                 var remoteStream = cont.GetResponseStream();
+				StreamReader reader = new StreamReader(remoteStream);
+				string responseText = reader.ReadToEnd();
+				responseText = responseText.Replace("src=\"/", $"src=\"{serviceUrlPrefix}/")
+									.Replace("href=\"/", $"href=\"{serviceUrlPrefix}/");
 
                 var remoteDoc = new HtmlDocument();
-                remoteDoc.Load(remoteStream);
+                remoteDoc.LoadHtml(responseText);
                 var body = remoteDoc.DocumentNode.SelectNodes("//body")[0];
                 var head = remoteDoc.DocumentNode.SelectNodes("//head")[0];
 
@@ -51,11 +56,12 @@ namespace MainUI.Services
                     Body = body
                 };
             }
-            catch (Exception)
+            catch (Exception _)
             {
                 return new RemoteHtmlData
                 {
-                    Body = HtmlNode.CreateNode("Page cannot be loaded ATM")
+                    Body = HtmlNode.CreateNode("Page cannot be loaded ATM"),
+					Head = HtmlNode.CreateNode("")
                 };
             }
         }

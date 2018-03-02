@@ -170,7 +170,7 @@ namespace MainUI.Services
         {
             var response = string.Empty;
 
-            var remoteHtml = await RemoteFetcher.GetHtml();
+            var remoteHtml = await RemoteFetcher.GetHtml(CompositeContext.MatchString);
 
             response = await GetTemplate(next);
 
